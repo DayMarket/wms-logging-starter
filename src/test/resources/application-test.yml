@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+
+
+logging:
+  maxPayload: 40
+  level:
+    root: debug

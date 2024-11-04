@@ -1,0 +1,17 @@
+{
+  "responseInfo": {
+    "uri": "http://localhost/complete?invoiceId=1",
+    "httpStatus": 200,
+    "headers": {
+      "Content-Length": [
+        "17"
+      ],
+      "Content-Type": [
+        "application/json"
+      ]
+    },
+    "payload": {
+      "response": "ok"
+    }
+  }
+}

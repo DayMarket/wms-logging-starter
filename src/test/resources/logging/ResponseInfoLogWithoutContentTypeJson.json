@@ -1,0 +1,12 @@
+{
+  "responseInfo": {
+    "uri": "http://localhost/complete?invoiceId=1",
+    "httpStatus": 200,
+    "headers": {
+      "Content-Length": [
+        "17"
+      ]
+    },
+    "payload": "Content-Type is not specified: {\"response\":\"ok\"}"
+  }
+}

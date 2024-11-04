@@ -1,0 +1,15 @@
+{
+  "responseInfo": {
+    "uri": "http://localhost/complete?invoiceId=1",
+    "httpStatus": 200,
+    "headers": {
+      "Content-Type": [
+        "text/xml"
+      ],
+      "Content-Length": [
+        "17"
+      ]
+    },
+    "payload": "Content-Type is text/xml. Content: <response>"
+  }
+}

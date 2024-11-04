@@ -1,0 +1,15 @@
+{
+  "responseInfo": {
+    "uri": "http://localhost/complete?invoiceId=1",
+    "httpStatus": 200,
+    "headers": {
+      "Content-Type": [
+        "application/json"
+      ],
+      "Content-Length": [
+        "50"
+      ]
+    },
+    "payload": "Payload length=50 but maxPayload=40. Please, increase logging.maxPayload. Truncated content: Lorem ipsum dolor sit amet, consectetuer"
+  }
+}
