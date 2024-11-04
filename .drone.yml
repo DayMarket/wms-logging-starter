@@ -7,14 +7,20 @@ volumes:
   - name: m2-cache
     host:
       path: /tmp/m2-cache-new
+  - name: docker
+    host:
+      path: /var/run/docker.sock
 
-steps:
-  - name: deploy-to-nexus
+anchors:
+  - &mvn-step
     image: ghcr.io/daymarket/maven:3.8.5-openjdk-17
+    pull: always
     privileged: true
     volumes:
       - name: m2-cache
         path: /root/.m2
+      - name: docker
+        path: /var/run/docker.sock
     environment:
       SERVER_USERNAME:
         from_secret: nexus_maven_um_writer_username
@@ -22,6 +28,18 @@ steps:
         from_secret: nexus_maven_um_writer_password
       GIT_PUSH_SSH_KEY:
         from_secret: ghmachine_ssh_key
+
+steps:
+#  - name: enforce-snapshot-version
+#    <<: *mvn-step
+#    commands:
+#      - mvn enforcer:enforce@snapshot-version
+#    when:
+#      branch:
+#        - development
+
+  - name: prepare-deploy
+    <<: *mvn-step
     commands:
       - mkdir ~/.ssh/
       - echo "$GIT_PUSH_SSH_KEY" > ~/.ssh/id_rsa
@@ -31,11 +49,46 @@ steps:
       - ssh-add -l
       - git config --global user.email "${DRONE_COMMIT_AUTHOR_EMAIL}"
       - git config --global user.name "${DRONE_COMMIT_AUTHOR}"
+      - git config --global --add url."git@github.com:".insteadOf "https://github.com/"
       - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-      - mvn enforcer:enforce@no-snapshots
-      - mvn -B deploy
+      - mvn -B versions:use-releases -DprocessParent=true
+      - mvn -B scm:checkin -Dmessage="[SKIP CI] Update dependency versions" -DpushChanges=false
+      - mvn -B -DskipTests -Darguments=-DskipTests release:prepare
+      - git fetch origin development
+      - git checkout development
+      - git merge master --no-ff --no-edit -m "Merge branch 'master' into development [skip test]"
+      - git push
     when:
       branch:
         - master
       event:
         - push
+
+  - name: build-and-test
+    <<: *mvn-step
+    commands:
+      - mvn package -U -B
+    when:
+      ref:
+        - refs/heads/development
+        - refs/pull/**
+
+  - name: tests
+    <<: *mvn-step
+    commands:
+      - mvn test -U -B
+    when:
+      ref:
+        - refs/tags/*
+
+  - name: deploy to nexus
+    <<: *mvn-step
+    commands:
+      - mvn deploy -B -Dmaven.test.skip=true -Dmaven.install.skip=true
+    when:
+      ref:
+        - refs/heads/development
+        - refs/tags/*
+      event:
+        - push
+        - tag
