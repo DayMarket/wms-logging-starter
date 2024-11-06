@@ -101,7 +101,7 @@ public class RequestResponseFilter extends AbstractRequestLoggingFilter {
     private void logRequest(HttpServletRequest httpServletRequest) {
         beforeRequest(httpServletRequest);
         try {
-            var servletServerHttpRequest = new ServletServerHttpRequest(httpServletRequest);
+            ServletServerHttpRequest servletServerHttpRequest = new ServletServerHttpRequest(httpServletRequest);
             ObjectNode message = objectMapper.createObjectNode();
             message.putPOJO(LoggingAttribute.HTTP_URI.getName(), servletServerHttpRequest.getURI());
             message.put(LoggingAttribute.HTTP_METHOD.getName(), httpServletRequest.getMethod());

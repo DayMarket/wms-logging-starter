@@ -88,6 +88,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         //test
         requestResponseFilter.doFilterInternal(request, response, filterChain);
 
+        //check
         String outLog = capturedOutput.getOut();
         String actualRequestLog = outLog.substring(outLog.indexOf("{\"requestInfo"), outLog.indexOf("}}}") + 3);
         String actualResponseLog = outLog.substring(outLog.indexOf("{\"responseInfo"), outLog.length() - 1);
@@ -123,6 +124,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         //test
         requestResponseFilter.doFilterInternal(request, response, filterChain);
 
+        //check
         String outLog = capturedOutput.getOut();
         String actualRequestLog = outLog.substring(outLog.indexOf("{\"requestInfo"), outLog.indexOf("}}}") + 3);
         String actualResponseLog = outLog.substring(outLog.indexOf("{\"responseInfo"), outLog.length() - 1);
@@ -157,6 +159,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         requestResponseFilter.doFilterInternal(request, response,
                 (request, response) -> response.getWriter().write(RESPONSE_CONTENT));
 
+        //check
         String outLog = capturedOutput.getOut();
         String actualRequestLog = outLog.substring(outLog.indexOf("{\"requestInfo"), outLog.indexOf("}}}") + 3);
         String actualResponseLog = outLog.substring(outLog.indexOf("{\"responseInfo"), outLog.length() - 1);
@@ -194,6 +197,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         requestResponseFilter.doFilterInternal(request, response,
                 (request, response) -> response.getWriter().write(contentMaxPayloadExceed));
 
+        //check
         String outLog = capturedOutput.getOut();
         String actualRequestLog = outLog.substring(outLog.indexOf("{\"requestInfo"), outLog.indexOf("}}}") + 3);
         String actualResponseLog = outLog.substring(outLog.indexOf("{\"responseInfo"), outLog.length() - 1);
@@ -229,6 +233,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         requestResponseFilter.doFilterInternal(request, response,
                 (request, response) -> response.getWriter().write("<response>"));
 
+        //check
         String outLog = capturedOutput.getOut();
         String actualRequestLog = outLog.substring(outLog.indexOf("{\"requestInfo"), outLog.indexOf("}}}") + 3);
         String actualResponseLog = outLog.substring(outLog.indexOf("{\"responseInfo"), outLog.length() - 1);
@@ -261,7 +266,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         //test
         requestResponseFilter.doFilterInternal(actuatorRequest, response, filterChain);
 
-        // проверяем, что не логируется для url /actuator
+        //check проверяем, что не логируется для url /actuator
         String outLog = capturedOutput.getOut();
         assertFalse(outLog.contains("requestInfo"));
         assertFalse(outLog.contains("responseInfo"));
@@ -270,34 +275,24 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
     @SneakyThrows
     @Test
     void beforeRequestEmptyAllHeadersTest() {
-        //data
-        requestResponseFilter.beforeRequest(request, StringUtils.EMPTY);
         //test
+        requestResponseFilter.beforeRequest(request, StringUtils.EMPTY);
+        //check
         assertNotNull(request.getAttribute(INCOMING_REQUEST_TIME));
     }
 
     @SneakyThrows
     @Test
-    void whenRequestSync_thenLogResponse() {
-        //given
-        RequestResponseFilter reqResFilter = spy(requestResponseFilter);
-        request.setAsyncStarted(false);
-        //when
-        reqResFilter.doFilterInternal(request, response, filterChain);
-        //then
-    }
-
-    @SneakyThrows
-    @Test
     void whenRequestAsync_thenNotLogResponse() {
-        //given
         RequestResponseFilter reqResFilter = spy(requestResponseFilter);
         request.setAsyncStarted(true);
         HttpServletRequest spyRequest = spy(request);
         when(spyRequest.getAsyncContext()).thenReturn(mock(AsyncContext.class));
-        //when
+
+        //test
         reqResFilter.doFilterInternal(spyRequest, response, filterChain);
-        //then
+
+        //check
         verify(spyRequest, times(1)).getAsyncContext();
         verify(spyRequest.getAsyncContext(), times(1)).addListener(any());
     }
@@ -313,6 +308,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         // test
         requestResponseFilter.doFilterInternal(request, response, filterChain);
 
+        //check
         ArgumentCaptor<HttpServletRequest> requestCaptor = ArgumentCaptor.forClass(HttpServletRequest.class);
         verify(filterChain, times(1)).doFilter(requestCaptor.capture(), eq(response));
         assertInstanceOf(ContentCachingRequestWrapper.class, requestCaptor.getValue());
@@ -327,6 +323,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         //test
         requestResponseFilter.doFilterInternal(request, response, filterChain);
 
+        //check
         String outLog = capturedOutput.getOut();
         assertFalse(
                 outLog.contains("java.lang.StringIndexOutOfBoundsException: Range [0, 40) out of bounds for length"));
@@ -343,6 +340,7 @@ class RequestResponseFilterTest extends BaseIntegrationTest {
         //test
         requestResponseFilter.doFilterInternal(request, response, filterChain);
 
+        //check
         String outLog = capturedOutput.getOut();
         assertFalse(
                 outLog.contains("java.lang.StringIndexOutOfBoundsException: Range [0, 40) out of bounds for length"));

@@ -1,6 +1,5 @@
 package com.uzum.wms.logging.starter.feignclient;
 
-import com.uzum.wms.logging.starter.feignclient.FeignClientCustomLogger;
 import feign.Logger;
 import feign.Request;
 import feign.Response;
@@ -10,9 +9,14 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(OutputCaptureExtension.class)
 class FeignClientLogResponseTest {
