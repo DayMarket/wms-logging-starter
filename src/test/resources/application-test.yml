@@ -5,6 +5,8 @@ spring:
 
 
 logging:
+  wms-starter:
+    enabled: true
   maxPayload: 40
   level:
     root: debug
