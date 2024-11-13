@@ -14,3 +14,4 @@
 Библиотека автоматически настроится благодаря Spring Boot auto-configuration.
 1. Добавьте зависимость в pom.xml
 2. В logback.xml сервиса укажите level="DEBUG" для name="com.uzum.wms.logging.starter"
+3. Добавить в параметры  'logging: request-response: enabled: true'
