@@ -1,0 +1,18 @@
+{
+  "requestInfo": {
+    "uri": "http://localhost/complete?invoiceId=1",
+    "httpMethod": "POST",
+    "headers": {
+      "Content-Type": [
+        "application/json;charset=UTF-8"
+      ],
+      "Content-Length": [
+        "15"
+      ]
+    },
+    "remoteAddress": "127.0.0.1",
+    "payload": {
+      "key": "value"
+    }
+  }
+}
