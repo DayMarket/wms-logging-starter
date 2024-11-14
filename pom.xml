@@ -31,6 +31,17 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>um-repo-snapshots</id>
+            <url>https://nexus.infra.cluster.daymarket.uz/repository/maven-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>um-repo-releases</id>
+            <url>https://nexus.infra.cluster.daymarket.uz/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
