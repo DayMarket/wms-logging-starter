@@ -1,0 +1,41 @@
+kind: pipeline
+name: wms-logging-starter
+node:
+  type: "um-common"
+
+volumes:
+  - name: m2-cache
+    host:
+      path: /tmp/m2-cache-new
+
+steps:
+  - name: deploy-to-nexus
+    image: ghcr.io/daymarket/maven:3.8.5-openjdk-17
+    privileged: true
+    volumes:
+      - name: m2-cache
+        path: /root/.m2
+    environment:
+      SERVER_USERNAME:
+        from_secret: nexus_maven_um_writer_username
+      SERVER_PASSWORD:
+        from_secret: nexus_maven_um_writer_password
+      GIT_PUSH_SSH_KEY:
+        from_secret: ghmachine_ssh_key
+    commands:
+      - mkdir ~/.ssh/
+      - echo "$GIT_PUSH_SSH_KEY" > ~/.ssh/id_rsa
+      - eval `ssh-agent -s`
+      - chmod 400 ~/.ssh/id_rsa
+      - ssh-add ~/.ssh/id_rsa
+      - ssh-add -l
+      - git config --global user.email "${DRONE_COMMIT_AUTHOR_EMAIL}"
+      - git config --global user.name "${DRONE_COMMIT_AUTHOR}"
+      - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      - mvn enforcer:enforce@no-snapshots
+      - mvn -B deploy
+    when:
+      branch:
+        - master
+      event:
+        - push
