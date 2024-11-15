@@ -34,7 +34,7 @@ steps:
       - mvn enforcer:enforce@snapshot-version
     when:
       branch:
-        - development
+        - feature/WMS-12478
 
   - name: prepare-deploy
     <<: *mvn-step
@@ -52,9 +52,9 @@ steps:
       - mvn -B versions:use-releases -DprocessParent=true
       - mvn -B scm:checkin -Dmessage="[SKIP CI] Update dependency versions" -DpushChanges=false
       - mvn -B -DskipTests -Darguments=-DskipTests release:prepare
-      - git fetch origin development
-      - git checkout development
-      - git merge master --no-ff --no-edit -m "Merge branch 'master' into development [skip test]"
+#      - git fetch origin development
+#      - git checkout development
+#      - git merge master --no-ff --no-edit -m "Merge branch 'master' into development [skip test]"
       - git push
     when:
       branch:
@@ -68,7 +68,7 @@ steps:
       - mvn package -U -B
     when:
       ref:
-        - refs/heads/development
+        - refs/heads/master
         - refs/pull/**
 
   - name: tests
@@ -85,7 +85,7 @@ steps:
       - mvn deploy -B -Dmaven.test.skip=true -Dmaven.install.skip=true
     when:
       ref:
-        - refs/heads/development
+        - refs/heads/master
         - refs/tags/*
       event:
         - push
@@ -104,7 +104,7 @@ steps:
 #        - success
 #        - failure
 #      ref:
-#        - refs/heads/development
+#        - refs/heads/master
 #        - refs/tags/*
 #    settings:
 #      format: markdown
