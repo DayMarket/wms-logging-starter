@@ -12,6 +12,7 @@ volumes:
 anchors:
   - &mvn-step
     image: ghcr.io/daymarket/maven:3.8.5-openjdk-17
+    pull: always
     privileged: true
     volumes:
       - name: m2-cache
@@ -48,7 +49,7 @@ steps:
       - git config --global user.name "${DRONE_COMMIT_AUTHOR}"
       - git config --global --add url."git@github.com:".insteadOf "https://github.com/"
       - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-      - mvn -B -U versions:use-releases -DprocessParent=true
+      - mvn -B versions:use-releases -DprocessParent=true
       - mvn -B scm:checkin -Dmessage="[SKIP CI] Update dependency versions" -DpushChanges=false
       - mvn -B -DskipTests -Darguments=-DskipTests release:prepare
       - git fetch origin development
@@ -66,24 +67,22 @@ steps:
     commands:
       - mvn package -U -B
     when:
-      branch:
-        exclude:
-          - master
+      ref:
+        - refs/heads/development
+        - refs/pull/**
 
   - name: tests
     <<: *mvn-step
     commands:
       - mvn test -U -B
     when:
-      branch:
-        - master
-      event:
-        - pull_request
+      ref:
+        - refs/tags/*
 
   - name: deploy to nexus
     <<: *mvn-step
     commands:
-      - mvn deploy -B -N -Dmaven.test.skip=true -Dmaven.install.skip=true
+      - mvn deploy -B -Dmaven.test.skip=true -Dmaven.install.skip=true
     when:
       ref:
         - refs/heads/development
@@ -91,32 +90,32 @@ steps:
       event:
         - push
         - tag
-
-  - name: telegram
-    image: appleboy/drone-telegram
-    failure: ignored
-    environment:
-      TELEGRAM_TOKEN:
-        from_secret: telegram_token
-      TELEGRAM_TO:
-        from_secret: telegram_to
-    when:
-      status:
-        - success
-        - failure
-      ref:
-        - refs/heads/development
-        - refs/tags/*
-    settings:
-      format: markdown
-      message: >
-        {{#success build.status}}
-        ⚙️ Status: build successful ✅
-        {{else}}
-        ⚙️ Status: build failed 🚨
-        {{/success}}
-        🔸 Repository: {{repo.owner}}/{{repo.name}}
-        ☘️ Branch: ** {{commit.branch}} **
-        📌 Commit: [{{commit.message}}]({{commit.link}})
-        🚀 Build URL: [build {{build.number}}]({{build.link}})
-        👨‍💻  Author:  [@{{commit.author}}](https://github.com/{{commit.author}})
+#
+#  - name: telegram
+#    image: appleboy/drone-telegram
+#    failure: ignored
+#    environment:
+#      TELEGRAM_TOKEN:
+#        from_secret: telegram_token
+#      TELEGRAM_TO:
+#        from_secret: telegram_to
+#    when:
+#      status:
+#        - success
+#        - failure
+#      ref:
+#        - refs/heads/development
+#        - refs/tags/*
+#    settings:
+#      format: markdown
+#      message: >
+#        {{#success build.status}}
+#        ⚙️ Status: build successful ✅
+#        {{else}}
+#        ⚙️ Status: build failed 🚨
+#        {{/success}}
+#        🔸 Repository: {{repo.owner}}/{{repo.name}}
+#        ☘️ Branch: ** {{commit.branch}} **
+#        📌 Commit: [{{commit.message}}]({{commit.link}})
+#        🚀 Build URL: [build {{build.number}}]({{build.link}})
+#        👨‍💻  Author:  [@{{commit.author}}](https://github.com/{{commit.author}})
