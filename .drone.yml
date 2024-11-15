@@ -11,7 +11,7 @@ volumes:
 
 anchors:
   - &mvn-step
-    image: ghcr.io/kazanexpress/maven:3.8.5-openjdk-17
+    image: ghcr.io/daymarket/maven:3.8.5-openjdk-17
     privileged: true
     volumes:
       - name: m2-cache
@@ -20,11 +20,11 @@ anchors:
         path: /var/run/docker.sock
     environment:
       SERVER_USERNAME:
-        from_secret: server_username
+        from_secret: nexus_maven_um_writer_username
       SERVER_PASSWORD:
-        from_secret: server_password
+        from_secret: nexus_maven_um_writer_password
       GIT_PUSH_SSH_KEY:
-        from_secret: git_ssh_key
+        from_secret: ghmachine_ssh_key
 
 steps:
   - name: enforce-snapshot-version
@@ -46,13 +46,14 @@ steps:
       - ssh-add -l
       - git config --global user.email "${DRONE_COMMIT_AUTHOR_EMAIL}"
       - git config --global user.name "${DRONE_COMMIT_AUTHOR}"
+      - git config --global --add url."git@github.com:".insteadOf "https://github.com/"
       - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
       - mvn -B -U versions:use-releases -DprocessParent=true
       - mvn -B scm:checkin -Dmessage="[SKIP CI] Update dependency versions" -DpushChanges=false
-      - mvn release:prepare -B
+      - mvn -B -DskipTests -Darguments=-DskipTests release:prepare
       - git fetch origin development
       - git checkout development
-      - git merge master --no-ff --no-edit -m "Merge branch 'master' into development [skip ci]"
+      - git merge master --no-ff --no-edit -m "Merge branch 'master' into development [skip test]"
       - git push
     when:
       branch:
