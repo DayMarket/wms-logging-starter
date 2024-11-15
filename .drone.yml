@@ -30,13 +30,13 @@ anchors:
         from_secret: ghmachine_ssh_key
 
 steps:
-#  - name: enforce-snapshot-version
-#    <<: *mvn-step
-#    commands:
-#      - mvn enforcer:enforce@snapshot-version
-#    when:
-#      branch:
-#        - development
+  - name: enforce-snapshot-version
+    <<: *mvn-step
+    commands:
+      - mvn enforcer:enforce@snapshot-version
+    when:
+      branch:
+        - development
 
   - name: prepare-deploy
     <<: *mvn-step
@@ -71,14 +71,8 @@ steps:
     when:
       ref:
         - refs/heads/development
+        - refs/heads/master
         - refs/pull/**
-
-  - name: tests
-    <<: *mvn-step
-    commands:
-      - mvn test -U -B
-    when:
-      ref:
         - refs/tags/*
 
   - name: deploy to nexus
@@ -87,8 +81,6 @@ steps:
       - mvn deploy -B -Dmaven.test.skip=true -Dmaven.install.skip=true
     when:
       ref:
-        - refs/heads/development
         - refs/tags/*
       event:
-        - push
         - tag
