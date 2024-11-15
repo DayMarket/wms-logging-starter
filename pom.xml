@@ -5,7 +5,7 @@
     <!--    TODO kazanexpress ???-->
     <groupId>com.kazanexpress.microservice</groupId>
     <artifactId>wms-logging-starter</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
