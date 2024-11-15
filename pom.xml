@@ -5,7 +5,7 @@
     <!--    TODO kazanexpress ???-->
     <groupId>com.kazanexpress.microservice</groupId>
     <artifactId>wms-logging-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -27,7 +27,7 @@
         <connection>scm:git:git@github.com:DayMarket/wms-logging-starter.git</connection>
         <developerConnection>scm:git:git@github.com:DayMarket/wms-logging-starter.git</developerConnection>
         <url>https://github.com/DayMarket/wms-logging-starter.git</url>
-        <tag>wms-logging-starter-1.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
