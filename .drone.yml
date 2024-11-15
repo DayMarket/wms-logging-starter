@@ -31,11 +31,73 @@ steps:
       - ssh-add -l
       - git config --global user.email "${DRONE_COMMIT_AUTHOR_EMAIL}"
       - git config --global user.name "${DRONE_COMMIT_AUTHOR}"
+      - - git config --global --add url."git@github.com:".insteadOf "https://github.com/"
       - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-      - mvn enforcer:enforce@no-snapshots
-      - mvn -B deploy
+      - mvn -B -U versions:use-releases -DprocessParent=true
+      - mvn -B scm:checkin -Dmessage="[SKIP CI] Update dependency versions" -DpushChanges=false
+      - mvn release:prepare -B
+      - git fetch origin development
+      - git checkout development
+      - git merge master --no-ff --no-edit -m "Merge branch 'master' into development [skip ci]"
+      - git push
     when:
       branch:
         - master
+        - development
       event:
         - push
+
+  - name: enforce-snapshot-version
+    image: ghcr.io/daymarket/maven:3.8.5-openjdk-17
+    privileged: true
+    volumes:
+      - name: m2-cache
+        path: /root/.m2
+    environment:
+      SERVER_USERNAME:
+        from_secret: nexus_maven_um_reader_username
+      SERVER_PASSWORD:
+        from_secret: nexus_maven_um_reader_password
+    commands:
+      - mvn enforcer:enforce@snapshot-version
+    when:
+      branch:
+        - development
+        - master
+
+  - name: deploy to nexus
+    image: ghcr.io/daymarket/maven:3.8.5-openjdk-17
+    privileged: true
+    volumes:
+      - name: m2-cache
+        path: /root/.m2
+    environment:
+      SERVER_USERNAME:
+        from_secret: nexus_maven_um_writer_username
+      SERVER_PASSWORD:
+        from_secret: nexus_maven_um_writer_password
+    commands:
+      - mvn deploy -U -B
+    when:
+      branch:
+        - development
+        - master
+      event:
+        - push
+
+  - name: deploy to nexus by tag
+    image: ghcr.io/daymarket/maven:3.8.5-openjdk-17
+    privileged: true
+    volumes:
+      - name: m2-cache
+        path: /root/.m2
+    environment:
+      SERVER_USERNAME:
+        from_secret: nexus_maven_um_writer_username
+      SERVER_PASSWORD:
+        from_secret: nexus_maven_um_writer_password
+    commands:
+      - mvn deploy -U -B
+    when:
+      event:
+        - tag
