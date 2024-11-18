@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
 
 import static com.uzum.wms.logging.starter.filters.RequestResponseFilter.INCOMING_REQUEST_TIME;
 import static com.uzum.wms.logging.starter.filters.RequestResponseFilter.INIT_URI;
-import static org.codehaus.plexus.util.ReaderFactory.UTF_8;
+import static org.apache.commons.compress.utils.CharsetNames.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
